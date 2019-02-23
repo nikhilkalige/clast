@@ -28,43 +28,44 @@ CLANG_VERSION = llvm_config('--version')[0].replace('.', '')
 # Rely on the llvm flags being compatible with the flags from Python
 # In cases where compilation fails, consider examining the verbose logs
 # of the build
-LLVM_CFLAGS  = [ f for f in llvm_config('--cflags') ] 
+LLVM_CFLAGS  = [ f for f in llvm_config('--cflags') ]
 
-# Rely on the dynamic library version of LLVM being present 
+# Rely on the dynamic library version of LLVM being present
 # If your version of LLVM is not compiled in this way, you can
 # try using llvm_config('--libs'), and adding any omitted libraries
-#LLVM_LIBS    = ['LLVM'] 
-#LLVM_LIBS    = llvm_config('--libs')
 LLVM_LIBS   =  [l.lstrip('-l') for l in llvm_config('--libs')]
 
 def clang_libraries():
     # Note that this list of libraries is drawn from Eli Bendersky's
     # excellent LLVM-Clang-Samples repository [1]
-    # 
+    #
     # [1] https://github.com/eliben/llvm-clang-samples
     libraries = [
         'clangAST',
+        'clangASTMatchers',
         'clangAnalysis',
         'clangBasic',
         'clangDriver',
-        'clangDynamicASTMatchers', 
+        'clangDynamicASTMatchers',
         'clangEdit',
         'clangFrontend',
-        'clangFormat',
         'clangFrontendTool',
         'clangLex',
         'clangParse',
         'clangSema',
         'clangEdit',
-        'clangASTMatchers',
         'clangRewrite',
         'clangRewriteFrontend',
         'clangStaticAnalyzerFrontend',
         'clangStaticAnalyzerCheckers',
         'clangStaticAnalyzerCore',
+        'clangCrossTU',
+        'clangIndex',
         'clangSerialization',
         'clangToolingCore',
         'clangTooling',
+        'clangFormat',
+        'clangToolingInclusions'
     ]
     libraries = ['-l' + lib for lib in libraries ]
     return ['-Wl,--start-group'] + libraries + ['-Wl,--end-group']
@@ -86,7 +87,7 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         '_clast',
-        glob.glob('src/*.cpp') + 
+        glob.glob('src/*.cpp') +
         glob.glob('src/%s/*.cpp' % CLANG_VERSION) +
         glob.glob('src/%s/generated/*.cpp' % CLANG_VERSION),
         extra_compile_args=LLVM_CFLAGS,
@@ -155,7 +156,7 @@ setup(
     install_requires= [
         'pybind11~=1.0'
     ],
-    packages     = {'clast': 'clast'}, 
+    packages     = {'clast': 'clast'},
     cmdclass     = {'build_ext': BuildExt},
     ext_modules  = ext_modules,
     classifiers  = [
