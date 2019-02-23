@@ -33,7 +33,9 @@ LLVM_CFLAGS  = [ f for f in llvm_config('--cflags') ]
 # Rely on the dynamic library version of LLVM being present 
 # If your version of LLVM is not compiled in this way, you can
 # try using llvm_config('--libs'), and adding any omitted libraries
-LLVM_LIBS    = ['LLVM'] 
+#LLVM_LIBS    = ['LLVM'] 
+#LLVM_LIBS    = llvm_config('--libs')
+LLVM_LIBS   =  [l.lstrip('-l') for l in llvm_config('--libs')]
 
 def clang_libraries():
     # Note that this list of libraries is drawn from Eli Bendersky's
@@ -151,7 +153,7 @@ setup(
     url          = "http://github.com/AndrewWalker/clast",
     license      = "MIT",
     install_requires= [
-        'pybind11>=1.7'
+        'pybind11~=1.0'
     ],
     packages     = {'clast': 'clast'}, 
     cmdclass     = {'build_ext': BuildExt},
